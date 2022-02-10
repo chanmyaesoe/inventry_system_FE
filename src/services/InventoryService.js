@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const INVENTORY_API_BASE_URL = 'http://localhost:8080/api/inventories';
+const INVENTORY_API_BASE_URL = 'http://localhost:8080/api/products';
 
 class InventoryService{
 
@@ -10,10 +10,8 @@ class InventoryService{
 
     addInventory(data){     
         const formData = new FormData();
-        formData.append('item_count', data.item_count);
-        formData.append('item_name', data.item_name);
-        formData.append('stocked_at', data.stocked_at);
-        
+        formData.append('barcode', data.barcode);
+        formData.append('product_name', data.product_name );
         const res = axios.post(INVENTORY_API_BASE_URL, formData, {
             headers:{
                 'Content-Type': 'multipart/form-data'
@@ -28,9 +26,8 @@ class InventoryService{
 
     updateInventory(data){ 
         const formData = new FormData();
-        formData.append('item_count', data.item_count);
-        formData.append('item_name', data.item_name);
-        formData.append('stocked_at', data.stocked_at);
+        formData.append('product_name', data.product_name);
+        formData.append('barcode', data.barcode);
         formData.append('id', data.id);
         const url = INVENTORY_API_BASE_URL + '/' + data.id;
         const res = axios.put(url, formData, {

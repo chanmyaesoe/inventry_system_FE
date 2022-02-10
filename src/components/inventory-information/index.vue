@@ -5,7 +5,6 @@
         <b-button class="m-3 btn btn-sm export" variant="info">
           <a href="http://localhost:8080/api/inventories/export">Export</a>
         </b-button>
-        
     </div>
     <div>
       <h4>Inventory Information</h4>
@@ -15,7 +14,8 @@
                 <thead>
                     <tr>
                         <th> Item </th>
-                        <th> Stock Count</th>
+                        <th> Stocked Count</th>
+                        <th> Barcode</th>
                         <th> Last Stocked Time </th>
                         <th> Updated Time</th>
                         <th> Actions </th>
@@ -23,10 +23,11 @@
                 </thead>
                 <tbody>
                     <tr v-for="inventory in inventorys" v-bind:key="inventory.id">
-                        <td> {{inventory.item_name }}</td>
-                        <td> {{inventory.item_count }}</td>
-                        <td> {{inventory.stocked_at}}</td>    
-                        <td> {{inventory.updated_at}}</td>
+                        <td> {{inventory.product_name }}</td>
+                        <td> {{inventory.current_count }}</td>
+                        <td> {{inventory.barcode }}</td>
+                        <td> {{inventory.last_stocked_at}}</td>    
+                        <td> {{inventory.created_at}}</td>
                         <td>  
                             <b-button class="m-3 btn btn-sm" variant="primary"  @click="openModal(inventory)" >Edit</b-button>
                             <b-button class="m-3 btn btn-sm" variant="danger" @click="deleteInventoryById(inventory.id)">Delete</b-button> 

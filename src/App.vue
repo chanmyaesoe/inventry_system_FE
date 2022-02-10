@@ -3,10 +3,13 @@
     <nav class="navbar navbar-expand navbar-dark bg-dark">
       <div class="navbar-nav mr-auto">
         <li class="nav-item">
-          <router-link to="/calender" class="nav-link">Calender</router-link>
+          <router-link to="/calender" class="nav-link">Inventory Data </router-link>
         </li>
         <li class="nav-item">
-          <router-link to="/inventory-information" class="nav-link">Inventory information</router-link>
+          <router-link to="/inventory-information" class="nav-link">Products</router-link>
+        </li>
+        <li class="nav-item">
+          <router-link to="/product-detials" class="nav-link">Products Details</router-link>
         </li>
         <li class="nav-item">
           <router-link to="/employees" class="nav-link">Employees</router-link>

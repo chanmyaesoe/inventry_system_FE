@@ -14,10 +14,10 @@
       <div class="form-group">
         <label for="firstName">Item Name </label>
         <b-form-select 
-          v-model="calender.inventory_id"
+          v-model="calender.product_id"
           @change="itemChange">
           <option v-for="inventory in inventories" :key="inventory.id" :value="inventory.id">
-            {{ inventory.item_name }} ({{ inventory.item_count }})
+            {{ inventory.product_name }} ({{ inventory.current_count }})
          </option>
         </b-form-select>
       </div>
@@ -31,7 +31,7 @@
           required
           name="title"
           min="1"
-          :max="max_item_count"
+          :max="max_product_count"
         />
       </div>
        <div class="flexbox-center">
@@ -53,7 +53,7 @@ export default {
    props: [ 'getCalender' ],
    computed: {
     currentItemValue() {
-      return this.inventories.find(option => option.id === this.calender.inventory_id)
+      return this.inventories.find(option => option.id === this.calender.product_id)
     }
   },
   data() {
@@ -61,13 +61,13 @@ export default {
         calender: {
             count: 0,
             employee_id:'',
-            inventory_id:'',
+            product_id:'',
             id:''
         },
         employees:[],
         inventories: [],
         isSave:true,
-        max_item_count:100
+        max_product_count:100
     };
   },
    methods: {
@@ -83,7 +83,7 @@ export default {
       var data = {
         count: this.calender.count,
         employee_id: this.calender.employee_id,
-        inventory_id: this.calender.inventory_id,
+        product_id: this.calender.product_id,
         id: this.calender.id
       };
       CalenderService.updateCalender(data)
@@ -122,14 +122,14 @@ export default {
         this.isSave = false
         this.calender.count = data.count
         this.calender.employee_id = data.employee_id
-        this.calender.inventory_id = data.inventory_id
-        this.max_item_count = data.item_count
+        this.calender.product_id = data.product_id
+        this.max_product_count = data.current_count
         this.calender.id = data.id
       } else {
         this.calender = {
             count: 0,
             employee_id:'',
-            inventory_id:'',
+            product_id:'',
             id:''
         }
         this.isSave = true
@@ -139,8 +139,8 @@ export default {
     },
     itemChange() {
       this.calender.count = 1
-      this.max_item_count = this.currentItemValue.item_count
-      console.log()
+      this.max_product_count = this.currentItemValue.current_count
+      console.log(this.currentItemValue)
     }
   }
 };

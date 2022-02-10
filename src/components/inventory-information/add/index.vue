@@ -7,24 +7,20 @@
         <input
           type="text"
           class="form-control"
-          v-model="inventory.item_name"
+          v-model="inventory.product_name"
           required
           name="title"
         />
       </div>
       <div class="form-group">
-        <label for="firstName">Stocked Count </label>
+        <label for="firstName">Barcode </label>
         <input
           type="text"
           class="form-control"
-          v-model="inventory.item_count"
+          v-model="inventory.barcode"
           required
           name="title"
         />
-      </div>
-      <div class="form-group">
-        <label for="firstName">Last Stocked DateTime </label>
-        <datetime format="YYYY-MM-DD h:i:s"  v-model="inventory.stocked_at" class="form-control-datetimepicker"></datetime>
       </div>
       <div class="flexbox-center">
         <b-button class="mt-3 btn-style" variant="outline-danger" block @click="hideModal">Cancel</b-button>
@@ -38,18 +34,15 @@
 
 <script>
 import InventoryService from "../../../services/InventoryService";
-import datetime from 'vuejs-datetimepicker';
 export default {
   name: "add-inventory",
-  components: { datetime },
   props: [ 'getInventory' ],
   data() {
    return {
       inventory: {
         id: '',
-        item_name: '',
-        item_count: '',
-        stocked_at: ''
+        product_name: '',
+        barcode: ''
       },
       IsSaveInventory:true
     };
@@ -57,9 +50,8 @@ export default {
   methods: {
     updateInventory() {
       var data = {
-        item_name: this.inventory.item_name,
-        item_count: this.inventory.item_count,
-        stocked_at: this.inventory.stocked_at,
+        product_name: this.inventory.product_name,
+        barcode: this.inventory.barcode,
         id: this.inventory.id
       };
       InventoryService.updateInventory(data)
@@ -77,9 +69,8 @@ export default {
     },
     saveInventory() {
       var data = {
-        item_name: this.inventory.item_name,
-        item_count: this.inventory.item_count,
-        stocked_at: this.inventory.stocked_at
+        product_name: this.inventory.product_name,
+        barcode: this.inventory.barcode
       };
       InventoryService.addInventory(data)
         .then(response => {
@@ -104,9 +95,8 @@ export default {
       } else {
         this.inventory = {
         id: '',
-        item_name: '',
-        item_count: '',
-        stocked_at: ''
+        product_name: '',
+        barcode: ''
       }
         this.IsSaveInventory = true
       }

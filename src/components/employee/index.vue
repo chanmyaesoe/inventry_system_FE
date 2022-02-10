@@ -2,7 +2,7 @@
   <div class="container">
     <div class="col-md-8">
       <div class="input-group mb-3">
-         <button class="m-3 btn btn-sm btn-success" @click="openModal('')">Add Employee</button>
+         <b-button variant="success" @click="openModal('')">Add Employee</b-button>
       </div>
     </div>
     <div>

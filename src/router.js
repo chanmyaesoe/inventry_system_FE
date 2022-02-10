@@ -22,6 +22,12 @@ export default new Router({
       alias: "/calender",
       name: "calender",
       component: () => import("./components/calender/index")
+    },
+    {
+      path: "/product-detials",
+      alias: "/product-detials",
+      name: "productDetails",
+      component: () => import("./components/product-details/index")
     }
   ]
 });

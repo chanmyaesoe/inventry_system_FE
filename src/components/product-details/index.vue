@@ -10,30 +10,14 @@
       <h4>productDetails Information</h4>
     </div>
     <div>
-<table class = "table table-striped">
-                <thead>
-                    <tr>
-                        <th> Item Name</th>
-                        <th> Count</th>
-                        <th> Remaining Count </th>
-                        <th> Price </th>
-                        <th> Last Stocked Time</th>
-                        <th> Actions </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-for="productDetail in productDetails" v-bind:key="productDetail.id">
-                        <td> {{productDetail.product_name }}</td>
-                        <td> {{productDetail.new_count }}</td>
-                        <td> {{productDetail.remaining_count}}</td>  
-                        <td> {{productDetail.price}}</td>    
-                        <td> {{productDetail.updated_at}}</td>
-                        <td>  
-                            <b-button class="m-3 btn btn-sm" variant="danger" @click="deleteProductDetailsById(productDetail.id)">Delete</b-button> 
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+            <b-table show-empty :items="items" :fields="fields" :current-page="currentPage" :per-page="0">
+        <!-- Optional default data cell scoped slot -->
+          <template #cell(action)="data">
+            <b-button class="m-3 btn btn-sm" variant="primary"  @click="openModal(data.item)" > Edit </b-button>
+            <b-button class="m-3 btn btn-sm" variant="danger" @click="deleteEmployeeById(data.item.id)">Delete</b-button> 
+          </template>
+        </b-table>
+        <b-pagination size="md" v-on:change="onPageChange" :total-rows="totalItems" v-model="currentPage" :per-page="pageInfo.pageSize"></b-pagination>
     </div>
   <AddComponent ref="productDetailForm" :getProductDetail="getproductDetails"/>
   </div>
@@ -50,16 +34,55 @@ export default {
   },
   data() {
     return {
-      productDetails: [],
+      items: [],
       currentproductDetails: null,
       currentIndex: -1,
-      title: ""
+      title: "",
+      currentPage: 1,
+      totalItems: 0,
+      pageInfo: {
+          pageNum:1,
+          pageSize:5
+      },
+      fields: [{
+          key: 'product_name',
+          label: 'Product Name'
+        },
+        {
+          key: 'new_count',
+          label: 'New Count'
+        },
+        {
+          key: 'remaining_count',
+          label: 'Remaining Count'
+        },
+        {
+          key: 'price',
+          label: 'Price'
+        },
+        {
+          key: 'updated_at',
+          label: 'Updated Time'
+        },
+        {
+          key: 'action',
+          label: 'Actions'
+        }
+      ]
     };
   },
   methods: {
-    getproductDetails(){ // get list
-        ProductDetailService.getproductDetails().then((response) => {
-            this.productDetails = response.data;   
+    onPageChange(data) {
+          this.pageInfo.pageNum = data;
+          this.getproductDetails(this.pageInfo);
+      },
+    getproductDetails(pageInfo = null){ // get list
+    if(pageInfo === null) {
+        pageInfo = this.pageInfo
+      }
+        ProductDetailService.getproductDetails(pageInfo).then((response) => {
+            this.items = response.data.data;
+            this.totalItems  = response.data.pageInfo.pageSize
         });
     },
     deleteProductDetailsById(id) { // delete
@@ -80,7 +103,7 @@ export default {
     }
   },
   mounted() {
-    this.getproductDetails();
+    this.getproductDetails(this.pageInfo);
   }
 };
 </script>

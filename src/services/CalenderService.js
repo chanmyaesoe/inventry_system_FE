@@ -7,8 +7,17 @@ const CALENDER_EXPORT_URL = 'http://localhost:8080/api/calenders/export';
 
 class CalenderService {
 
-    getCalender() {
-        return axios.get(CALENDER_API_BASE_URL);
+    getCalender(data) {
+        const formData = {
+            'pageNum': data.pageNum,
+            'pageSize': data.pageSize
+        }
+        const res = axios.get(CALENDER_API_BASE_URL, {params:formData}, {
+            headers:{
+                'Content-Type': 'multipart/form-data'
+            }
+        });
+        return res;
     }
     getCalenderByDate(datetime) {
         const temp = datetime.split(" ")

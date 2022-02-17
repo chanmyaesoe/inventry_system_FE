@@ -4,8 +4,20 @@ const INVENTORY_API_BASE_URL = 'http://localhost:8080/api/products';
 
 class InventoryService{
 
-    getInventory(){
-        return axios.get(INVENTORY_API_BASE_URL);
+    getInventory(data = null){
+        let formData = null
+        if(data != null) {
+            formData = {
+                'pageNum': data.pageNum,
+                'pageSize': data.pageSize
+            }
+        }        
+        const res = axios.get(INVENTORY_API_BASE_URL, {params:formData}, {
+            headers:{
+                'Content-Type': 'multipart/form-data'
+            }
+        });
+        return res;
     }
 
     addInventory(data){     

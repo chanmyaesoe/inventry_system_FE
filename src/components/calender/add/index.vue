@@ -73,10 +73,10 @@ export default {
    methods: {
      fillUpData() {  // fetch data for select boxes
         InventoryService.getInventory().then((response) => {          
-          this.inventories = response.data; 
+          this.inventories = response.data.data; 
         });
         EmployeeService.getEmployees().then((response) => {
-          this.employees = response.data; 
+          this.employees = response.data.data; 
         });       
      },
     updateData() { // update

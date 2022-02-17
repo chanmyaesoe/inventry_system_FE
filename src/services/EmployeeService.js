@@ -4,8 +4,20 @@ const EMPLOYEE_API_BASE_URL = 'http://localhost:8080/api/employees';
 
 class EmployeeService{
 
-    getEmployees(){
-        return axios.get(EMPLOYEE_API_BASE_URL);
+    getEmployees(data){
+        let formData = null
+        if(data != null) {
+            formData = {
+                'pageNum': data.pageNum,
+                'pageSize': data.pageSize
+            }
+        }
+        const res = axios.get(EMPLOYEE_API_BASE_URL, {params:formData}, {
+            headers:{
+                'Content-Type': 'multipart/form-data'
+            }
+        });
+        return res;
     }
 
     addEmployee(data){     

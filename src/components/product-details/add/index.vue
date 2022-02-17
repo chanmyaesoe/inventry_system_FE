@@ -61,7 +61,7 @@ export default {
   methods: {
     fillUpData() {  // fetch data for select boxes
         InventoryService.getInventory().then((response) => {          
-          this.products = response.data; 
+          this.products = response.data.data; 
         });      
     },
     saveProductDetail() {
@@ -74,7 +74,7 @@ export default {
         .then(response => {
           if(response.data.status === 200) {
             this.hideModal();
-            this.getProductDetail();
+            // this.getProductDetail();
           }
           this.$toastr.s(response.data.message);
         })
@@ -98,7 +98,6 @@ export default {
         stocked_at: ''
       }
       }
-     
       this.$refs['productDetailForm'].show()
     }
   }

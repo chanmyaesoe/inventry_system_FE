@@ -1,45 +1,55 @@
 <template>
   <div class="container">
     <div class="col-md-8">
-        <b-button variant="success" @click="openModal('')">Add Calender</b-button>
-        <!-- <b-button class="m-3 btn btn-sm export" variant="info">
-          <a href="http://localhost:8080/api/calenders/export">Export</a>
-        </b-button> -->
-        <b-button class="m-3 btn btn-sm" variant="info"  @click="exportModal()" > Export </b-button>
+      <b-button variant="success" @click="openModal('')">Add Calender</b-button>
+      <b-button class="m-3 btn btn-sm" variant="info" @click="exportModal()">
+        Export
+      </b-button>
     </div>
     <div>
       <h4>Inventory Calender</h4>
     </div>
     <div>
-<table class = "table table-striped">
-                <thead>
-                    <tr>
-                        <th> Employee Name</th>
-                        <th> inventory </th>
-                        <th> Count </th>
-                        <th> Remaning Stocked Count </th>
-                        <th> DateTime</th>
-                        <th> Actions </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-for="calender in calenders" v-bind:key="calender.id">
-                        <td> {{calender.first_name }} {{calender.last_name }}</td>
-                        <td> {{calender.product_name }}</td>
-                        <td> {{calender.count}}</td>  
-                        <td> {{calender.current_count}}</td>    
-                        <td> <span @click="openDateTimeModal(calender.datetime)" class="data-link">{{calender.datetime}}</span></td>
-                        <td>                              
-                            <b-button class="m-3 btn btn-sm" variant="primary"  @click="openModal(calender)" > Edit </b-button>
-                            <b-button class="m-3 btn btn-sm" variant="danger" @click="deleteEmployeeById(calender.id)">Delete</b-button> 
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+      <b-table
+        show-empty
+        :items="items"
+        :fields="fields"
+        :current-page="currentPage"
+        :per-page="0">
+        <template #cell(first_name)="data">
+          {{ data.item.first_name }} {{ data.item.last_name }}
+        </template>
+        <template #cell(datetime)="data">
+          <span @click="openDateTimeModal(data.item.datetime)" class="data-link"> {{ data.item.datetime }} </span>
+        </template>
+        <!-- Optional default data cell scoped slot -->
+        <template #cell(action)="data">
+          <b-button
+            class="m-3 btn btn-sm"
+            variant="primary"
+            @click="openModal(data.item)"
+          >
+            Edit
+          </b-button>
+          <b-button
+            class="m-3 btn btn-sm"
+            variant="danger"
+            @click="deleteEmployeeById(data.item.id)"
+            >Delete</b-button
+          >
+        </template>
+      </b-table>
+      <b-pagination
+        size="md"
+        v-on:change="onPageChange"
+        :total-rows="totalItems"
+        v-model="currentPage"
+        :per-page="pageInfo.pageSize"
+      ></b-pagination>
     </div>
-    <AddComponent ref="addForm" :getCalender="getCalender"/>
-    <DateTimeComponent ref="openDateTimeModal"/>
-    <ExportComponent ref="exportModal"/>
+    <AddComponent ref="addForm" :getCalender="getCalender" />
+    <DateTimeComponent ref="openDateTimeModal" />
+    <ExportComponent ref="exportModal" />
   </div>
 </template>
 
@@ -54,50 +64,95 @@ export default {
   components: {
     AddComponent,
     DateTimeComponent,
-    ExportComponent
+    ExportComponent,
   },
   data() {
     return {
-      calenders: [],
+      items: [],
       currentIndex: -1,
-      title: ""
+      title: "",
+      currentPage: 1,
+      totalItems: 0,
+      pageInfo: {
+        pageNum: 1,
+        pageSize: 5,
+      },
+      fields: [
+        {
+          key: "first_name",
+          label: "First Name",
+        },
+        {
+          key: "product_name",
+          label: "Product Name",
+        },
+        {
+          key: "count",
+          label: "Added Count",
+        },
+        {
+          key: "current_count",
+          label: "Remaining Stocked Count",
+        },
+        {
+          key: "datetime",
+          label: "Datetime",
+        },
+        {
+          key: "action",
+          label: "Actions",
+        },
+      ],
     };
   },
   methods: {
-    getCalender() { // get list
-        CalenderService.getCalender().then((response) => {
-            this.calenders = response.data;   
-        });
+    onPageChange(data) {
+      this.pageInfo.pageNum = data;
+      this.getCalender(this.pageInfo);
     },
-    deleteEmployeeById(id) { // delete
+    getCalender(pageInfo = null) {
+      // get list
+      if (pageInfo === null) {
+        pageInfo = this.pageInfo;
+      }
+      CalenderService.getCalender(pageInfo).then((response) => {
+        this.items = response.data.data;
+        this.totalItems = response.data.pageInfo.pageSize;
+      });
+    },
+    deleteEmployeeById(id) {
+      // delete
       CalenderService.deleteEmployeeById(id)
-        .then(response => {
-          if(response.data.status === 200) {
+        .then((response) => {
+          if (response.data.status === 200) {
             this.getInventory();
           }
           this.$toastr.s(response.data.message);
         })
-        .catch(e => {
+        .catch((e) => {
           console.log(e);
           this.$toastr.e(e.data.message);
         });
     },
-    openModal(data) { // open add/update form
-      this.$refs.addForm.openModal(data)
+    openModal(data) {
+      // open add/update form
+      this.$refs.addForm.openModal(data);
     },
-    openDateTimeModal(datetime) { // open add/update form
-      this.$refs.openDateTimeModal.openModal(datetime)
+    openDateTimeModal(datetime) {
+      // open add/update form
+      this.$refs.openDateTimeModal.openModal(datetime);
     },
-    exportModal() { // open add/update form
-      this.$refs.exportModal.openModal()
-    },    
+    exportModal() {
+      // open add/update form
+      this.$refs.exportModal.openModal();
+    },
   },
   mounted() {
-    this.getCalender();
-  }
+    this.getCalender(this.pageInfo);
+  },
 };
 </script>
 
 <style>
-  @import '../../assets/css/common.css';
+@import "../../assets/css/common.css";
 </style>

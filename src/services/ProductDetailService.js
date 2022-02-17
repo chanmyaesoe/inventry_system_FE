@@ -4,8 +4,17 @@ const PRODUCT_DETAIL_API_BASE_URL = 'http://localhost:8080/api/product-details';
 
 class ProductDetailService{
 
-    getproductDetails(){
-        return axios.get(PRODUCT_DETAIL_API_BASE_URL);
+    getproductDetails(data){
+        const formData = {
+            'pageNum': data.pageNum,
+            'pageSize': data.pageSize
+        }
+        const res = axios.get(PRODUCT_DETAIL_API_BASE_URL, {params:formData}, {
+            headers:{
+                'Content-Type': 'multipart/form-data'
+            }
+        });
+        return res;
     }
 
     addProductDetail(data){     

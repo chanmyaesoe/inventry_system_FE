@@ -1,114 +1,121 @@
 <template>
-  <div class="container">
+  <div class="container">    
+    <div>
+      <h4>Employees Information</h4>
+    </div>
     <div class="col-md-8">
-      <div class="input-group mb-3">
-         <b-button variant="success" @click="openModal('')">Add Employee</b-button>
-      </div>
+        <b-button variant="success" @click="openModal('')">Add Employee</b-button>
     </div>
     <div>
-      <h4>Employees List</h4>
+        <b-table show-empty :items="items" :fields="fields" :current-page="currentPage" :per-page="0">
+        <!-- Optional default data cell scoped slot -->
+          <template #cell(action)="data">
+            <b-button class="m-3 btn btn-sm" variant="primary"  @click="openModal(data.item)" > Edit </b-button>
+            <b-button class="m-3 btn btn-sm" variant="danger" @click="deleteEmployeeById(data.item.id)">Delete</b-button> 
+          </template>
+        </b-table>
+        <b-pagination size="md" v-on:change="onPageChange" :total-rows="totalItems" v-model="currentPage" :per-page="pageInfo.pageSize"></b-pagination>
     </div>
-    <div>
-      <div v-if="currentEmployee">
-        <h4>Employee</h4>
-        <div>
-          <label><strong>Title:</strong></label> {{ currentEmployee.title }}
-        </div>
-        <div>
-          <label><strong>Description:</strong></label> {{ currentEmployee.description }}
-        </div>
-        <div>
-          <label><strong>Status:</strong></label> {{ currentEmployee.published ? "Published" : "Pending" }}
-        </div>
-
-        <router-link :to="'/employees/' + currentEmployee.id" class="badge badge-warning">Edit</router-link>
-      </div>
-    </div>
-    <div>
-<table class = "table table-striped">
-                <thead>
-                    <tr>
-                        <th> Employee Id</th>
-                        <th> Employee First Name</th>
-                        <th> Employee Last</th>
-                        <th> Employee Email</th>
-                        <th> Actions </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-for="employee in employees" v-bind:key="employee.id">
-                        <td> {{employee.id }}</td>
-                        <td> {{employee.first_name }}</td>
-                        <td> {{employee.last_name}}</td>    
-                        <td> {{employee.email}}</td>
-                        <td>  
-                            
-                            <b-button class="m-3 btn btn-sm" variant="primary"  @click="openModal(employee)" >Edit</b-button>
-                            <b-button class="m-3 btn btn-sm" variant="danger" @click="deleteEmployeeById(employee.id)">Delete</b-button> 
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-    </div>
-    <AddComponent ref="addForm" :getEmployee="getEmployees"/>
+    <AddComponent ref="addForm" :getEmployee="getEmployees" />
   </div>
 </template>
+<!--
 
+
+ -->
 <script>
 import EmployeeService from "../../services/EmployeeService";
 import AddComponent from "./add/index.vue";
 
 export default {
   name: "Employee",
-  components:{AddComponent},
+  components: { AddComponent },
   data() {
     return {
-      employees: [],
-      currentEmployee: null,
+      items: [],
       currentIndex: -1,
-      title: ""
+      title: "",
+      currentPage: 1,
+      totalItems: 0,
+      pageInfo: {
+          pageNum:1,
+          pageSize:5
+      },
+      fields: [{
+          key: 'first_name',
+          label: 'First Name'
+        },
+        {
+          key: 'last_name',
+          label: 'Last Name'
+        },
+        {
+          key: 'email',
+          label: 'Email'
+        },
+        {
+          key: 'action',
+          label: 'Actions'
+        }
+      ]
     };
   },
   methods: {
-    getEmployees(){ //get list
-        EmployeeService.getEmployees().then((response) => {
-            this.employees = response.data;   
-        });
+      onPageChange(data) {
+          this.pageInfo.pageNum = data;
+          this.getEmployees(this.pageInfo);
+      },
+    getEmployees(pageInfo = null) {
+      //get list
+      if(pageInfo === null) {
+        pageInfo = this.pageInfo
+      }
+      EmployeeService.getEmployees(pageInfo).then((response) => {
+        this.items = response.data.data;
+        this.totalItems  = response.data.pageInfo.pageSize
+      });
     },
 
-    deleteEmployeeById(id) { // delete api
+    deleteEmployeeById(id) {
+      // delete api
       EmployeeService.deleteEmployeeById(id)
-        .then(response => {
-          if(response.data.status === 200) {
+        .then((response) => {
+          // console.log(response.data.message)
+          if (response.data.status === 200) {
             this.getEmployees();
           }
           this.$toastr.s(response.data.message);
         })
-        .catch(e => {
-          this.$toastr.e(e.data.message);
-          console.log(e);
-        });
-    },    
-    searchTitle() {
-      EmployeeService.findByTitle(this.title)
-        .then(response => {
-          this.employees = response.data;
-          console.log(response.data);
-        })
-        .catch(e => {
+        .catch((e) => {
+          console.log("hwerwer")
+          console.log(e)
+          // this.$toastr.e(e.data.message);
           console.log(e);
         });
     },
-    openModal(data) { //open add/update form
-      this.$refs.addForm.openModal(data)
-    }
+    searchTitle() {
+      EmployeeService.findByTitle(this.title)
+        .then((response) => {
+          this.employees = response.data;
+          console.log(response.data);
+        })
+        .catch((e) => {
+          console.log(e);
+        });
+    },
+    openModal(data) {
+      //open add/update form
+      console.log("here")
+      console.log(data)
+      this.$refs.addForm.openModal(data);
+    },
   },
   mounted() {
-    this.getEmployees();
-  }
+    this.getEmployees(this.pageInfo);
+  },
 };
 </script>
 
 <style>
-  @import '../../assets/css/common.css';
+@import "../../assets/css/common.css";
 </style>

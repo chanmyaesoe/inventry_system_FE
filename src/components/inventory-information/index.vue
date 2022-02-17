@@ -10,31 +10,14 @@
       <h4>Inventory Information</h4>
     </div>
     <div>
-<table class = "table table-striped">
-                <thead>
-                    <tr>
-                        <th> Item </th>
-                        <th> Stocked Count</th>
-                        <th> Barcode</th>
-                        <th> Last Stocked Time </th>
-                        <th> Updated Time</th>
-                        <th> Actions </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-for="inventory in inventorys" v-bind:key="inventory.id">
-                        <td> {{inventory.product_name }}</td>
-                        <td> {{inventory.current_count }}</td>
-                        <td> {{inventory.barcode }}</td>
-                        <td> {{inventory.last_stocked_at}}</td>    
-                        <td> {{inventory.created_at}}</td>
-                        <td>  
-                            <b-button class="m-3 btn btn-sm" variant="primary"  @click="openModal(inventory)" >Edit</b-button>
-                            <b-button class="m-3 btn btn-sm" variant="danger" @click="deleteInventoryById(inventory.id)">Delete</b-button> 
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+            <b-table show-empty :items="items" :fields="fields" :current-page="currentPage" :per-page="0">
+        <!-- Optional default data cell scoped slot -->
+          <template #cell(action)="data">
+            <b-button class="m-3 btn btn-sm" variant="primary"  @click="openModal(data.item)" > Edit </b-button>
+            <b-button class="m-3 btn btn-sm" variant="danger" @click="deleteInventoryById(data.item.id)">Delete</b-button> 
+          </template>
+        </b-table>
+        <b-pagination size="md" v-on:change="onPageChange" :total-rows="totalItems" v-model="currentPage" :per-page="pageInfo.pageSize"></b-pagination>
     </div>
   <AddComponent ref="inventoryForm" :getInventory="getInventory"/>
   </div>
@@ -51,16 +34,55 @@ export default {
   },
   data() {
     return {
-      inventorys: [],
+      items: [],
       currentInventory: null,
       currentIndex: -1,
-      title: ""
+      title: "",
+      currentPage: 1,
+      totalItems: 0,
+      pageInfo: {
+          pageNum:1,
+          pageSize:5
+      },
+      fields: [{
+          key: 'product_name',
+          label: 'Product Name'
+        },
+        {
+          key: 'current_count',
+          label: 'stocked Count'
+        },
+        {
+          key: 'barcode',
+          label: 'Barcode'
+        },
+        {
+          key: 'last_stocked_at',
+          label: 'stocked Time'
+        },
+        {
+          key: 'created_at',
+          label: 'Created Time'
+        },
+        {
+          key: 'action',
+          label: 'Actions'
+        }
+      ]
     };
   },
   methods: {
-    getInventory(){ // get list
-        InventoryService.getInventory().then((response) => {
-            this.inventorys = response.data;   
+    onPageChange(data) {
+          this.pageInfo.pageNum = data;
+          this.getInventory(this.pageInfo);
+      },
+    getInventory(pageInfo = null){ // get list
+      if(pageInfo === null) {
+          pageInfo = this.pageInfo
+        }
+        InventoryService.getInventory(pageInfo).then((response) => {
+            this.items = response.data.data;
+            this.totalItems  = response.data.pageInfo.pageSize
         });
     },
 
@@ -82,7 +104,7 @@ export default {
     }
   },
   mounted() {
-    this.getInventory();
+    this.getInventory(this.pageInfo);
   }
 };
 </script>
